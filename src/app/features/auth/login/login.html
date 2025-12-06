@@ -1,0 +1,25 @@
+<div style="padding: 50px; text-align: center; font-family: sans-serif;">
+
+  <h1 style="color: #333;">Global Line Solutions</h1>
+  <h3 style="color: #666;">Iniciar Sesión</h3>
+
+  <form [formGroup]="loginForm" (ngSubmit)="ingresar()" style="display: inline-block; text-align: left; border: 1px solid #ddd; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; margin-bottom: 5px;">Correo Electrónico:</label>
+      <input type="email" formControlName="email" placeholder="admin@globalline.com" style="width: 250px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; margin-bottom: 5px;">Contraseña:</label>
+      <input type="password" formControlName="password" style="width: 250px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <p style="font-weight: bold; color: blue; text-align: center;">{{ mensaje }}</p>
+
+    <button type="submit" [disabled]="loginForm.invalid" style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">
+      ENTRAR
+    </button>
+
+  </form>
+</div>
