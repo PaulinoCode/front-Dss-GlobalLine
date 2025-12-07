@@ -1,0 +1,43 @@
+<div class="container mt-5">
+  <div class="card shadow p-4" style="max-width: 600px; margin: 0 auto;">
+    <h2 class="text-center mb-4">{{ isEdit ? '✏️ Editar' : '👤 Nuevo' }} Usuario</h2>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+
+      <div class="mb-3">
+        <label class="form-label">Nombre Completo</label>
+        <input type="text" formControlName="name" class="form-control" placeholder="Juan Perez">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Correo Electrónico</label>
+        <input type="email" formControlName="email" class="form-control" placeholder="juan@globalline.com">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Rol de Acceso</label>
+        <select formControlName="role" class="form-select">
+          <option value="MANAGER">MANAGER (Operativo)</option>
+          <option value="ADMIN">ADMIN (Acceso Total)</option>
+        </select>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-bold">Contraseña</label>
+        <input type="password" formControlName="password" class="form-control"
+               [placeholder]="isEdit ? '(Dejar vacía para no cambiar)' : 'Ingresa contraseña'">
+        <div *ngIf="form.get('password')?.invalid && form.get('password')?.touched" class="text-danger small">
+          La contraseña es requerida (min 4 caracteres).
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between pt-3 border-top">
+        <a routerLink="/users" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" [disabled]="form.invalid" class="btn btn-primary">
+          {{ isEdit ? 'Actualizar' : 'Crear Usuario' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
