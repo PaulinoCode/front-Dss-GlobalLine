@@ -1,0 +1,58 @@
+<div class="container mt-5">
+  <div class="card shadow p-4" style="max-width: 700px; margin: 0 auto;">
+
+    <h2 class="text-center mb-4">
+      {{ isEditMode ? '📦 Editar Producto' : '📦 Nuevo Producto' }}
+    </h2>
+
+    <form [formGroup]="productForm" (ngSubmit)="save()">
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label fw-bold">ASIN</label>
+          <input type="text" formControlName="asin" class="form-control" placeholder="Ej. B08CF5">
+        </div>
+        <div class="col-md-8 mb-3">
+          <label class="form-label fw-bold">Nombre del Producto</label>
+          <input type="text" formControlName="name" class="form-control" placeholder="Ej. Audífonos Bluetooth">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold text-success">Precio de Venta ($)</label>
+          <input type="number" formControlName="price" class="form-control">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold text-danger">Costo ($)</label>
+          <input type="number" formControlName="cost" class="form-control">
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label fw-bold text-primary">Asignar a Cliente (Dueño)</label>
+        <select formControlName="clientId" class="form-select">
+          <option [ngValue]="null" disabled>-- Selecciona un cliente --</option>
+
+          <option *ngFor="let client of clients$ | async" [value]="client.id">
+            {{ client.name }}
+          </option>
+
+        </select>
+        <div *ngIf="productForm.get('clientId')?.invalid && productForm.get('clientId')?.touched" class="text-danger small mt-1">
+          Debes asignar un cliente responsable.
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between mt-4 border-top pt-3">
+        <a routerLink="/products" class="btn btn-secondary">
+          Cancelar
+        </a>
+        <button type="submit" [disabled]="productForm.invalid" class="btn btn-primary">
+          {{ isEditMode ? 'Actualizar Producto' : 'Guardar Producto' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
