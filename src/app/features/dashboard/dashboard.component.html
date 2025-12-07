@@ -1,0 +1,91 @@
+<div class="container-fluid mt-4">
+  <h2 class="mb-4">🚀 Panel de Control</h2>
+
+  <!-- Fila 1: Visión General Financiera -->
+  <div class="row mb-4">
+    <div class="col-lg-8 mb-4 mb-lg-0">
+      <div class="card shadow h-100">
+        <div class="card-header bg-dark text-white fw-bold d-flex justify-content-between">
+          <span>📊 Rentabilidad: Ingresos vs Inversión en Publicidad</span>
+          <small class="text-white-50">Comparativa Mensual</small>
+        </div>
+        <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;">
+          <div *ngIf="isLoadingComparison" class="text-center">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Analizando datos financieros...</p>
+          </div>
+          <canvas baseChart #comparisonChart *ngIf="!isLoadingComparison"
+                  [data]="comparisonChartData" [options]="comparisonChartOptions" type="bar"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="card bg-primary text-white shadow h-100">
+        <div class="card-body text-center d-flex flex-column justify-content-center">
+          <h4 class="card-title">Ingresos Totales Históricos</h4>
+          <p class="display-4 fw-bold m-0">{{ totalRevenue | currency }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fila 2: Análisis de Clientes -->
+  <div class="row mb-4">
+    <div class="col-lg-7 mb-4 mb-lg-0">
+      <div class="card shadow h-100">
+        <div class="card-header fw-bold">🍰 Ventas por Cliente (Distribución)</div>
+        <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;">
+          <div *ngIf="isLoadingClients" class="text-center">
+            <div class="spinner-border text-info"></div>
+            <p class="mt-2">Cargando distribución...</p>
+          </div>
+          <canvas baseChart #pieChart *ngIf="!isLoadingClients"
+                  [data]="pieChartData" [options]="pieChartOptions" type="pie"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow h-100">
+        <div class="card-header bg-success text-white fw-bold">🏆 Podio: Mejores 3 Clientes</div>
+        <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;">
+          <div *ngIf="isLoadingClients" class="text-center">
+            <div class="spinner-border text-success"></div>
+            <p class="mt-2">Calculando podio...</p>
+          </div>
+          <canvas baseChart #top3ClientsChart *ngIf="!isLoadingClients"
+                  [data]="top3ChartData" [options]="top3ChartOptions" type="bar"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fila 3: Análisis de Ventas y Productos -->
+  <div class="row">
+    <div class="col-lg-7 mb-4 mb-lg-0">
+      <div class="card shadow h-100">
+        <div class="card-header fw-bold">📈 Tendencia de Ventas</div>
+        <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;">
+          <div *ngIf="isLoadingMonthly" class="text-center">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-2">Cargando tendencia...</p>
+          </div>
+          <canvas baseChart #lineChart *ngIf="!isLoadingMonthly"
+                  [data]="lineChartData" [options]="lineChartOptions" type="line"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card shadow h-100">
+        <div class="card-header fw-bold">🛍️ Top 5 Productos Más Vendidos</div>
+        <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;">
+          <div *ngIf="isLoadingTopProducts" class="text-center">
+            <div class="spinner-border text-warning"></div>
+            <p class="mt-2">Cargando productos...</p>
+          </div>
+          <canvas baseChart #barChart *ngIf="!isLoadingTopProducts"
+                  [data]="barChartData" [options]="barChartOptions" type="bar"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
