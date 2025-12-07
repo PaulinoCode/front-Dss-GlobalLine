@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root',
 })
-export class Auth {
+export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
 
@@ -28,7 +28,8 @@ export class Auth {
         // Si el login funciona, guardamos el nuevo token limpio
         localStorage.setItem('auth_token', credentials);
         localStorage.setItem('user_role', user.role);
-        console.log('Login correcto, usuario:', user);
+        localStorage.setItem('user_name', user.name);
+        console.log('LoginComponent correcto, usuario:', user);
       })
     );
   }
