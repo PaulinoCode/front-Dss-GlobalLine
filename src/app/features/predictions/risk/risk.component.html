@@ -1,0 +1,101 @@
+<div class="container mt-4">
+  <h2 class="mb-4">🎲 Análisis de Riesgo (Montecarlo)</h2>
+
+  <!-- Panel de Control -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-8">
+          <label for="productSelect" class="form-label"><strong>Producto a Analizar:</strong></label>
+          <select id="productSelect" class="form-select" [(ngModel)]="selectedProduct" (ngModelChange)="onProductChange()">
+            <option [ngValue]="null" disabled>-- Selecciona un producto --</option>
+            <option *ngFor="let p of products$ | async" [ngValue]="p">
+              {{ p.name }} (ASIN: {{ p.asin }})
+            </option>
+          </select>
+        </div>
+        <div class="col-md-4 d-grid">
+          <button (click)="ejecutarMontecarlo()" [disabled]="!selectedProduct || loading" class="btn btn-primary btn-lg">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            {{ loading ? ' Simulando...' : 'Ejecutar Análisis' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de Resultados -->
+  <ng-container *ngIf="result$ | async as result">
+    <div *ngIf="analyzedProduct" class="results-panel row g-4">
+
+      <!-- Tarjeta de Información del Producto (Diseño nuevo, botón estático) -->
+      <div class="col-lg-5">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header bg-dark text-white">
+            <h3 class="h5 mb-0">📦 {{ analyzedProduct.name }}</h3>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush mb-3">
+              <div class="list-group-item d-flex justify-content-between"><strong>ASIN:</strong> <span>{{ analyzedProduct.asin }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Precio Base:</strong> <span class="text-success fw-bold">{{ analyzedProduct.price | currency }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Costo Base:</strong> <span class="text-danger fw-bold">{{ analyzedProduct.cost | currency }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Margen:</strong> <span>{{ (analyzedProduct.price - analyzedProduct.cost) | currency }}</span></div>
+            </div>
+
+            <div class="d-grid">
+              <button (click)="descargarReporte()" class="btn btn-outline-dark">
+                <span>📄</span>
+                Descargar Reporte PDF
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+
+      <!-- Tarjeta de Puntuación de Riesgo -->
+      <div class="col-lg-7">
+        <div class="card h-100 shadow-sm border-0" [ngClass]="getRiskCardClass()">
+
+          <div class="card-body text-center">
+            <h3 class="card-title">Probabilidad de Éxito</h3>
+
+            <div class="display-3 fw-bold my-3" [ngClass]="getRiskTextColor()">
+              {{ successRate | number:'1.0-1' }}%
+            </div>
+
+            <p class="h5 fw-light mb-4">{{ getRiskMessage() }}</p>
+
+            <div class="progress mb-4" style="height: 25px;">
+              <div class="progress-bar bg-success" [style.width.%]="successRate">
+                {{ result.profitable_scenarios | number }}
+              </div>
+              <div class="progress-bar bg-danger" [style.width.%]="100 - successRate">
+                {{ result.loss_scenarios | number }}
+              </div>
+            </div>
+
+            <div class="mt-4 bg-white p-3 rounded shadow-sm" style="height: 250px;">
+              <canvas baseChart
+                      [data]="riskChartData"
+                      [options]="riskChartOptions"
+                      type="bar">
+              </canvas>
+            </div>
+
+          </div>
+
+          <div class="card-footer bg-transparent border-0 text-muted text-center">
+            Total de simulaciones realizadas: <strong>{{ result.total_simulations | number }}</strong>
+          </div>
+        </div>
+      </div>
+
+
+
+
+    </div>
+  </ng-container>
+</div>
