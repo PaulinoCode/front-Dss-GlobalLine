@@ -1,0 +1,34 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="text-center mb-4">
+        <h1 class="h3 mb-3 fw-normal">Global Line Solutions</h1>
+        <h3 class="h5 mb-3 fw-light">Iniciar Sesión</h3>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <form [formGroup]="loginForm" (ngSubmit)="ingresar()">
+
+            <div class="form-floating mb-3">
+              <input type="email" class="form-control" id="floatingInput" formControlName="email" placeholder="admin@globalline.com">
+              <label for="floatingInput">Correo Electrónico</label>
+            </div>
+
+            <div class="form-floating mb-3">
+              <input type="password" class="form-control" id="floatingPassword" formControlName="password" placeholder="Contraseña">
+              <label for="floatingPassword">Contraseña</label>
+            </div>
+
+            <p class="text-primary fw-bold text-center">{{ mensaje }}</p>
+
+            <button class="w-100 btn btn-lg btn-primary" type="submit" [disabled]="loginForm.invalid">
+              ENTRAR
+            </button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
