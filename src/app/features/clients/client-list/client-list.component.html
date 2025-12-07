@@ -1,0 +1,57 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Listado de Clientes</h2>
+    <a routerLink="/clients/new" class="btn btn-success">
+      + Nuevo Cliente
+    </a>
+  </div>
+
+  <ng-container *ngIf="clients$ | async as clientsList; else loading">
+    <div *ngIf="clientsList.length > 0; else noClients" class="table-responsive shadow-sm rounded">
+      <table class="table table-striped table-hover align-middle mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col" class="ps-3">ID</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Email</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col" class="text-end pe-3">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let client of clientsList">
+            <td class="ps-3">{{ client.id }}</td>
+            <td>{{ client.name }}</td>
+            <td>{{ client.email }}</td>
+            <td>{{ client.phone }}</td>
+            <td class="text-end pe-3">
+              <a [routerLink]="['/clients/edit', client.id]" class="btn btn-warning btn-sm me-2">
+                Editar
+              </a>
+
+              <button (click)="delete(client.id!)" class="btn btn-danger btn-sm">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #noClients>
+      <div class="alert alert-info text-center mt-3">
+        No hay clientes registrados aún.
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="text-center p-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="mt-2 text-muted">Cargando datos...</p>
+    </div>
+  </ng-template>
+
+</div>

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-// Asegúrate que la ruta al archivo clientM.ts sea correcta
-import { ClientM } from '../models/clientM';
+// Asegúrate que la ruta al archivo client.model.ts sea correcta
+import { ClientModel } from '../models/client.model';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -14,13 +14,13 @@ export class ClientService {
   private apiUrl = 'http://localhost:8080/api/clients';
 
   // 1. Obtener todos (READ)
-  getClients(): Observable<ClientM[]> {
-    return this.http.get<ClientM[]>(this.apiUrl);
+  getClients(): Observable<ClientModel[]> {
+    return this.http.get<ClientModel[]>(this.apiUrl);
   }
 
   // 2. Crear uno nuevo (CREATE)
-  createClient(client: ClientM): Observable<ClientM> {
-    return this.http.post<ClientM>(this.apiUrl, client);
+  createClient(client: ClientModel): Observable<ClientModel> {
+    return this.http.post<ClientModel>(this.apiUrl, client);
   }
 
   // 3. Eliminar (DELETE)
@@ -29,12 +29,12 @@ export class ClientService {
   }
 
   // 4. Obtener por ID (Para editar luego)
-  getClientById(id: number): Observable<ClientM> {
-    return this.http.get<ClientM>(`${this.apiUrl}/${id}`);
+  getClientById(id: number): Observable<ClientModel> {
+    return this.http.get<ClientModel>(`${this.apiUrl}/${id}`);
   }
 
   // 5. Actualizar (UPDATE) - ¡CORREGIDO!
-  updateClient(id: number, client: ClientM): Observable<ClientM> {
-    return this.http.put<ClientM>(`${this.apiUrl}/${id}`, client);
+  updateClient(id: number, client: ClientModel): Observable<ClientModel> {
+    return this.http.put<ClientModel>(`${this.apiUrl}/${id}`, client);
   }
 }
