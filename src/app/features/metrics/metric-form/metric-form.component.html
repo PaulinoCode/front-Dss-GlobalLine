@@ -1,0 +1,58 @@
+<div class="container mt-5">
+  <div class="card shadow p-4" style="max-width: 600px; margin: 0 auto;">
+
+    <h2 class="text-center mb-4">
+      {{ isEditMode ? '✏️ Editar Métrica' : '📈 Registrar Venta' }}
+    </h2>
+
+    <form [formGroup]="form" (ngSubmit)="save()">
+
+      <div class="mb-3">
+        <label class="form-label fw-bold text-primary">Producto</label>
+        <select formControlName="productId" class="form-select">
+          <option [ngValue]="null" disabled>-- Selecciona el producto --</option>
+          <option *ngFor="let p of products$ | async" [value]="p.id">
+            {{ p.name }} (ASIN: {{ p.asin }})
+          </option>
+        </select>
+        <div *ngIf="form.get('productId')?.invalid && form.get('productId')?.touched" class="text-danger small">
+          Debes seleccionar un producto.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Fecha del Reporte</label>
+        <input type="date" formControlName="date" class="form-control">
+      </div>
+
+      <div class="row">
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Unidades (u)</label>
+          <input type="number" formControlName="salesUnits" class="form-control">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label text-success">Ingresos ($)</label>
+          <input type="number" formControlName="revenue" class="form-control" placeholder="0.00">
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label text-danger">Gasto Ads ($)</label>
+          <input type="number" formControlName="adSpend" class="form-control" placeholder="0.00">
+        </div>
+
+      </div>
+
+      <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+        <a routerLink="/metrics" class="btn btn-secondary">
+          Cancelar
+        </a>
+        <button type="submit" [disabled]="form.invalid" class="btn btn-primary">
+          {{ isEditMode ? 'Actualizar' : 'Guardar Métrica' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
