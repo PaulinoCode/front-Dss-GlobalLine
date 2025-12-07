@@ -1,0 +1,36 @@
+<div class="container mt-5">
+  <div class="card shadow p-4" style="max-width: 600px; margin: 0 auto;">
+
+    <h2 class="text-center mb-4">
+      {{ isEditMode ? '✏️ Editar Cliente' : '➕ Nuevo Cliente' }}
+    </h2>
+
+    <form [formGroup]="clientForm" (ngSubmit)="save()">
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Nombre Completo</label>
+        <input type="text" formControlName="name" class="form-control" placeholder="Ej. Tienda de Juan">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Correo Electrónico</label>
+        <input type="email" formControlName="email" class="form-control" placeholder="Ej. juan@tienda.com">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-bold">Teléfono</label>
+        <input type="text" formControlName="phone" class="form-control" placeholder="Ej. 555-1234">
+      </div>
+
+      <div class="d-flex justify-content-between mt-4">
+        <a routerLink="/clients" class="btn btn-secondary">
+          Cancelar
+        </a>
+        <button type="submit" [disabled]="clientForm.invalid" class="btn btn-primary">
+          {{ isEditMode ? 'Actualizar' : 'Guardar' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
