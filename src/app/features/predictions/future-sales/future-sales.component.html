@@ -1,0 +1,159 @@
+<div class="container mt-4">
+  <h2 class="mb-4">🔮 Predicción de Ventas Futuras</h2>
+
+  <!-- Panel de Control -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-5">
+          <label for="productSelect" class="form-label"><strong>Producto a Analizar:</strong></label>
+          <select id="productSelect" class="form-select" [(ngModel)]="selectedProduct" (ngModelChange)="onProductChange()" [disabled]="loading">
+            <option [ngValue]="null" disabled>-- Selecciona un producto --</option>
+            <option *ngFor="let p of products$ | async" [ngValue]="p">
+              {{ p.name }} (ASIN: {{ p.asin }})
+            </option>
+          </select>
+          <div *ngIf="loading" class="text-muted small mt-1">
+            <em>Selector bloqueado durante el análisis...</em>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <label for="adSpendInput" class="form-label"><strong>Inversión Publicitaria:</strong></label>
+          <div class="input-group">
+            <span class="input-group-text">$</span>
+            <input type="number" id="adSpendInput" class="form-control" [(ngModel)]="adSpend" (ngModelChange)="onAdSpendChange()" [disabled]="loading" placeholder="0.00" min="0" step="0.01">
+          </div>
+        </div>
+        <div class="col-md-4 d-grid">
+          <button (click)="ejecutarPrediccionVentas()" [disabled]="!selectedProduct || adSpend <= 0 || loading" class="btn btn-primary btn-lg">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            {{ loading ? ' Prediciendo...' : 'Predecir Ventas' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de Error -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>⚠️ Error:</strong> {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Panel de Resultados -->
+  <ng-container *ngIf="result$ | async as result">
+    <div *ngIf="analyzedProduct" class="results-panel row g-4">
+
+      <!-- Tarjeta de Información del Producto -->
+      <div class="col-lg-5">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header bg-dark text-white">
+            <h3 class="h5 mb-0">📦 {{ analyzedProduct.name }}</h3>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush mb-3">
+              <div class="list-group-item d-flex justify-content-between"><strong>ASIN:</strong> <span>{{ analyzedProduct.asin }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Precio Base:</strong> <span class="text-success fw-bold">{{ analyzedProduct.price | currency }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Costo Base:</strong> <span class="text-danger fw-bold">{{ analyzedProduct.cost | currency }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Margen Unitario:</strong> <span>{{ (analyzedProduct.price - analyzedProduct.cost) | currency }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Cliente:</strong> <span>{{ analyzedProduct.client?.name || 'N/A' }}</span></div>
+            </div>
+
+            <!-- Parámetros de Predicción -->
+            <div class="bg-light p-3 rounded mb-3">
+              <h6 class="fw-bold mb-2">📊 Parámetros de Análisis:</h6>
+              <div class="small">
+                <div class="d-flex justify-content-between"><strong>Inversión Publicitaria:</strong> <span class="text-primary fw-bold">{{ result.future_ad_spend | currency }}</span></div>
+                <div class="d-flex justify-content-between"><strong>Modelo Usado:</strong> <span class="text-muted">{{ result.model }}</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de Predicción -->
+      <div class="col-lg-7">
+        <div class="card h-100 shadow-sm border-2" [ngClass]="getAccuracyCardClass(result.model_accuracy)">
+
+          <div class="card-body text-center">
+            <h3 class="card-title">
+              {{ getAccuracyIcon(result.model_accuracy) }} Predicción de Ventas
+            </h3>
+
+            <!-- Unidades Predichas -->
+            <div class="row mb-4">
+              <div class="col-12">
+                <div class="display-3 fw-bold" [ngClass]="getAccuracyTextColor(result.model_accuracy)">
+                  {{ result.predicted_units | number:'1.0-0' }}
+                </div>
+                <p class="h5 fw-light">unidades estimadas</p>
+              </div>
+            </div>
+
+            <!-- Métricas Financieras -->
+            <div class="row text-center mb-4">
+              <div class="col-4">
+                <div class="border border-2 rounded p-3 bg-info-subtle border-info">
+                  <h6 class="mb-1 text-info">💰 Ingresos Est.</h6>
+                  <div class="fw-bold">{{ getEstimatedRevenue(result) | currency:'USD':'symbol':'1.0-0' }}</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border border-2 rounded p-3 bg-success-subtle border-success">
+                  <h6 class="mb-1 text-success">📈 Ganancia Est.</h6>
+                  <div class="fw-bold">{{ getEstimatedProfit(result) | currency:'USD':'symbol':'1.0-0' }}</div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border border-2 rounded p-3 bg-warning-subtle border-warning">
+                  <h6 class="mb-1 text-warning">🎯 ROI</h6>
+                  <div class="fw-bold">{{ getROI(result) | number:'1.1-1' }}%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Precisión del Modelo -->
+            <div class="mb-4">
+              <p class="h5 fw-light mb-3">{{ getAccuracyMessage(result.model_accuracy) }}</p>
+              <div class="progress mb-2" style="height: 25px;">
+                <div class="progress-bar"
+                     [ngClass]="getAccuracyTextColor(result.model_accuracy).replace('text-', 'bg-')"
+                     [style.width.%]="getAccuracyPercentage(result.model_accuracy)">
+                  {{ getAccuracyPercentage(result.model_accuracy) | number:'1.1-1' }}% precisión
+                </div>
+              </div>
+            </div>
+
+            <!-- Indicadores de Confianza -->
+            <div class="row text-center mt-4">
+              <div class="col-4">
+                <div class="border border-2 rounded p-3"
+                     [ngClass]="result.model_accuracy >= 0.9 ? 'bg-success-subtle border-success' : 'bg-light border-secondary'">
+                  <h6 class="mb-1">🎯 Muy Confiable</h6>
+                  <small class="text-muted">≥90% precisión</small>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border border-2 rounded p-3"
+                     [ngClass]="(result.model_accuracy >= 0.7 && result.model_accuracy < 0.9) ? 'bg-warning-subtle border-warning' : 'bg-light border-secondary'">
+                  <h6 class="mb-1">📊 Moderada</h6>
+                  <small class="text-muted">70-89% precisión</small>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border border-2 rounded p-3"
+                     [ngClass]="result.model_accuracy < 0.7 ? 'bg-danger-subtle border-danger' : 'bg-light border-secondary'">
+                  <h6 class="mb-1">⚠️ Baja Confianza</h6>
+                  <small class="text-muted">&lt;70% precisión</small>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+</div>
+
