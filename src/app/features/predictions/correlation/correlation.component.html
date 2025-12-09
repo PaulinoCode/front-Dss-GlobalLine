@@ -1,0 +1,113 @@
+<div class="container mt-4">
+  <h2 class="mb-4">📊 Análisis de Correlación (Inversión vs Ventas)</h2>
+
+  <!-- Panel de Control -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-8">
+          <label for="productSelect" class="form-label"><strong>Producto a Analizar:</strong></label>
+          <select id="productSelect" class="form-select" [(ngModel)]="selectedProduct" (ngModelChange)="onProductChange()" [disabled]="loading">
+            <option [ngValue]="null" disabled>-- Selecciona un producto --</option>
+            <option *ngFor="let p of products$ | async" [ngValue]="p">
+              {{ p.name }} (ASIN: {{ p.asin }})
+            </option>
+          </select>
+          <div *ngIf="loading" class="text-muted small mt-1">
+            <em>Selector bloqueado durante el análisis...</em>
+          </div>
+        </div>
+        <div class="col-md-4 d-grid">
+          <button (click)="ejecutarAnalisisCorrelacion()" [disabled]="!selectedProduct || loading" class="btn btn-primary btn-lg">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            {{ loading ? ' Analizando...' : 'Calcular Correlación' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje de Error -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>⚠️ Error:</strong> {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Close"></button>
+  </div>
+
+  <!-- Panel de Resultados -->
+  <ng-container *ngIf="result$ | async as result">
+    <div *ngIf="analyzedProduct" class="results-panel row g-4">
+
+      <!-- Tarjeta de Información del Producto -->
+      <div class="col-lg-5">
+        <div class="card h-100 shadow-sm">
+          <div class="card-header bg-dark text-white">
+            <h3 class="h5 mb-0">📦 {{ analyzedProduct.name }}</h3>
+          </div>
+          <div class="card-body">
+            <div class="list-group list-group-flush mb-3">
+              <div class="list-group-item d-flex justify-content-between"><strong>ASIN:</strong> <span>{{ analyzedProduct.asin }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Precio Base:</strong> <span class="text-success fw-bold">{{ analyzedProduct.price | currency }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Costo Base:</strong> <span class="text-danger fw-bold">{{ analyzedProduct.cost | currency }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Margen:</strong> <span>{{ (analyzedProduct.price - analyzedProduct.cost) | currency }}</span></div>
+              <div class="list-group-item d-flex justify-content-between"><strong>Cliente:</strong> <span>{{ analyzedProduct.client?.name || 'N/A' }}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tarjeta de Resultado de Correlación -->
+      <div class="col-lg-7">
+        <div class="card h-100 shadow-sm border-2" [ngClass]="getCorrelationCardClass(result.correlation_coefficient)">
+
+          <div class="card-body text-center">
+            <h3 class="card-title">
+              {{ getCorrelationIcon(result.correlation_coefficient) }} Correlación Publicitaria
+            </h3>
+
+            <div class="display-3 fw-bold my-3" [ngClass]="getCorrelationTextColor(result.correlation_coefficient)">
+              {{ result.correlation_coefficient | number:'1.0-4' }}
+            </div>
+
+            <p class="h5 fw-light mb-4">{{ result.interpretation }}</p>
+
+            <!-- Barra de Progreso Mostrando Fuerza de la Correlación -->
+            <div class="progress mb-4" style="height: 25px;">
+              <div class="progress-bar"
+                   [ngClass]="getCorrelationTextColor(result.correlation_coefficient).replace('text-', 'bg-')"
+                   [style.width.%]="getCorrelationPercentage(result.correlation_coefficient)">
+                {{ getCorrelationPercentage(result.correlation_coefficient) | number:'1.0-1' }}% de fuerza
+              </div>
+            </div>
+
+            <!-- Indicadores Visuales -->
+            <div class="row text-center mt-4">
+              <div class="col-4">
+                <div class="border border-2 rounded p-3"
+                     [ngClass]="result.correlation_coefficient >= 0.7 ? 'bg-success-subtle border-success' : 'bg-light border-secondary'">
+                  <h6 class="mb-1">🔥 Altamente Eficiente</h6>
+                  <small class="text-muted">Excelente correlación</small>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border border-2 rounded p-3"
+                     [ngClass]="(result.correlation_coefficient >= 0.3 && result.correlation_coefficient < 0.7) ? 'bg-warning-subtle border-warning' : 'bg-light border-secondary'">
+                  <h6 class="mb-1">📊 Moderado</h6>
+                  <small class="text-muted">Correlación aceptable</small>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="border border-2 rounded p-3"
+                     [ngClass]="(result.correlation_coefficient > -0.3 && result.correlation_coefficient < 0.3) ? 'bg-danger-subtle border-danger' : 'bg-light border-secondary'">
+                  <h6 class="mb-1">⚠️ Desperdiciado</h6>
+                  <small class="text-muted">Correlación baja</small>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+</div>

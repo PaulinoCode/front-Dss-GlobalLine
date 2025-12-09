@@ -3,6 +3,7 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { ClientListComponent } from './features/clients/client-list/client-list.component';
 import { authGuard } from './core/guards/auth-guard';
 import {RiskComponent} from './features/predictions/risk/risk.component';
+import {CorrelationComponent} from './features/predictions/correlation/correlation.component';
 import {ClientFormComponent} from './features/clients/client-form/client-form.component';
 import {ProductListComponent} from './features/products/product-list/product-list.component';
 import {ProductFormComponent} from './features/products/product-form/product-form.component';
@@ -46,6 +47,13 @@ export const routes: Routes = [
   {
     path: 'risk',
     component: RiskComponent,
+    canActivate: [authGuard]
+  },
+
+  // Correlación
+  {
+    path: 'correlation',
+    component: CorrelationComponent,
     canActivate: [authGuard]
   }
 ];
